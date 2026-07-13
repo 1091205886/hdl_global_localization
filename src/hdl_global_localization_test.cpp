@@ -10,6 +10,7 @@
 #include <hdl_global_localization/SetGlobalLocalizationEngine.h>
 #include <hdl_global_localization/SetGlobalMap.h>
 #include <hdl_global_localization/QueryGlobalLocalization.h>
+#include "string"
 
 class GlobalLocalizationTestNode {
 public:
@@ -87,13 +88,19 @@ private:
 };
 
 int main(int argc, char** argv) {
+  if (argc < 3) {
+    std::cout << "usage: rosrun hdl_global_localization hdl_global_localization_node <map.pcd> <reloc_mode>" << std::endl;
+    return 0;
+  }
+  std::string reloc_mode(argv[2]);
+
   ros::init(argc, argv, "hdl_global_localization_test");
 
   pcl::PointCloud<pcl::PointXYZ>::Ptr global_map(new pcl::PointCloud<pcl::PointXYZ>);
   pcl::io::loadPCDFile(argv[1], *global_map);
 
   GlobalLocalizationTestNode node;
-  // node.set_engine("FPFH_RANSAC");
+  node.set_engine(reloc_mode);  // FPFH_RANSAC BBS FPFH_TEASER    （FPFH_TEASER模式需要开启-DENABLE_TEASER=ON编译）
   node.set_global_map(global_map);
 
   ros::spin();
